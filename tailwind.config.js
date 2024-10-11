@@ -6,7 +6,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        Lexend: "Lexend Deca"
+        Lexend: "Lexend Deca",
+        Great: "Great Vibes"
       }
     },
   },

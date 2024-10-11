@@ -1,4 +1,26 @@
 import mainBg from './main-bg.webp'
 import logo from './logo.png'
+import flogo from './footer-logo.png'
 import calender from './calender.png'
-export { mainBg, logo, calender }
+import sliderBg from './slider-bg.png'
+import s1 from './s1.png'
+import s2 from './s2.png'
+import s3 from './s3.png'
+import s4 from './s4.png'
+import s5 from './s5.png'
+import s6 from './s6.png'
+import s7 from './s7.png'
+import eventBaner from './event-baner.png'
+import off1 from './8off.png'
+import off2 from './10off.png'
+import off3 from './12off.png'
+import pass1 from './pass1.png'
+import pass2 from './pass2.png'
+import pass3 from './pass3.png'
+import managment from './managment.png'
+import gift from './gift.png'
+import footer from './footer-bg.webp'
+import gold from './gold.png'
+
+
+export { mainBg, logo, flogo, calender, sliderBg, s1, s2, s3, s4, s5, s6, gold, s7, eventBaner, off1, off2, off3, footer, gift, pass1, pass2, pass3, managment }

@@ -1,3 +1,3 @@
-import MainHeader from "./mainHeader";
+import MainHeader from "./Main";
 
 export { MainHeader }
