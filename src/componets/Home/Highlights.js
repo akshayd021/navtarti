@@ -24,7 +24,7 @@ const Highlights = () => {
 
     return (
         <div>
-            <h2 className='text-[32px] font-Great my-5 text-black'>Highlights of Events..!!</h2>
+            <h2 className='text-[32px] font-Great my-5 text-black text-center'>Highlights of Events..!!</h2>
             <Carousel
                 responsive={responsive}
                 autoPlay={true}

@@ -26,10 +26,10 @@ const Slider = () => {
     return (
         <div>
             <div
-                className="bg-cover bg-center h-[660px] w-full "
+                className="bg-cover bg-center h-[660px] w-full text-center "
                 style={{ backgroundImage: `url(${sliderBg})` }}
             >
-                <h3 className='font-Great pt-10 text-black text-[32px]'>
+                <h3 className='font-Great pt-10 text-black text-[32px] '>
                     Awesome Musical Night
                 </h3>
                 <h1 className="uppercase text-[32px] font-semibold text-black mt-2 font-Lexend">PREMIUM MUSICAL ICONS</h1>

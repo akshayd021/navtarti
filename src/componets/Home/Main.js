@@ -83,8 +83,8 @@ const MainHeader = () => {
                 <img src={eventBaner} alt='event-managmet' className='w-full ' />
             </div>
             <div className='bg-[#f5f5f5] border-y py-10'>
-                <h3 className='font-Great text-[#232323] text-[30px]'>Enjoy Suvarn Offers This Navratri Season!</h3>
-                <h2 className='font-Lexend text-[22px] text-[#232323] mt-1 font-[600] '>Navratri Offers for You!</h2>
+                <h3 className='font-Great text-[#232323] text-[30px] text-center'>Enjoy Suvarn Offers This Navratri Season!</h3>
+                <h2 className='font-Lexend text-[22px] text-[#232323] mt-1 font-[600] text-center'>Navratri Offers for You!</h2>
                 <div className='flex justify-center items-center gap-10 mt-10 mx-auto'>
                     <div className='flex flex-col items-center'>
                         <img src={off1} alt='8% off' className='w-[295px]' />
@@ -101,7 +101,7 @@ const MainHeader = () => {
                 </div>
             </div>
             <div className='flex justify-center items-center mt-10 gap-10 mx-auto'>
-                <Link to={`/products/ultimate-3-day-combo-tickets-suvarn-navratri-surat`}>
+                <Link to={`/products/daily-gold-tickets-suvarn-navratri-surat`}>
                     <div className='bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4' style={{ backgroundImage: `url(${pass1})` }}>
                         <h4 className='text-[#8400b0] mt-1 text-[23px] font-bold capitalize'>Gold pass</h4>
                         <p className='text-[12px] text-[#343434] mt-1'>Premium Gateway to exclusive Navratri nights!</p>
@@ -109,7 +109,7 @@ const MainHeader = () => {
                         <button className='bg-[#ccc] mt-1 px-[12px] py-1 text-[18px] rounded-lg text-[#232323]'>Book Now</button>
                     </div>
                 </Link>
-                <Link to={`/products/ultimate-3-day-combo-tickets-suvarn-navratri-surat`}>
+                <Link to={`/products/daily-platinum-tickets-suvarn-navratri-surat`}>
                     <div className='bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4' style={{ backgroundImage: `url(${pass2})` }}>
                         <h4 className='text-[#8400b0] mt-1 text-[23px] font-bold capitalize'>Platinum pass</h4>
                         <p className='text-[12px] text-[#343434] mt-1'>Enjoy closer proximity to the performances.</p>
@@ -133,8 +133,8 @@ const MainHeader = () => {
                 <Highlights />
             </div>
             <div className='my-10 px-10'>
-                <h2 className='text-[32px] font-Great  text-black'>Event Gifts</h2>
-                <h1 className='text-black text-[32px] font-[600]'>Our Complimentary Gifts For You</h1>
+                <h2 className='text-[32px] font-Great  text-black text-center'>Event Gifts</h2>
+                <h1 className='text-black text-[32px] font-[600] text-center'>Our Complimentary Gifts For You</h1>
                 <div className='flex justify-center items-center gap-10 mt-6'>
                     <div className='w-1/2'>
                         <img src={gift} alt='gift' />
