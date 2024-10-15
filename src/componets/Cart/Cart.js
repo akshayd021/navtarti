@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { IoIosArrowDown } from 'react-icons/io';
-import { IoLocationOutline } from 'react-icons/io5';
-import { gold, logo, pass1 } from '../../assets';
+import React, { useEffect, useState } from "react";
+import { IoIosArrowDown } from "react-icons/io";
+import { IoLocationOutline } from "react-icons/io5";
+import { gold, logo, platinum } from "../../assets";
 import { FaEdit } from "react-icons/fa";
 // import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { IoCloseSharp } from "react-icons/io5";
-import { Link } from 'react-router-dom';
-import UpdatePassModal from './UpdatePassModel';
+import { Link } from "react-router-dom";
+import UpdatePassModal from "./UpdatePassModel";
 
 const Cart = () => {
-    const [passes, setPasses] = useState(JSON.parse(localStorage.getItem('passes')) || []);
+    const [passes, setPasses] = useState(
+        JSON.parse(localStorage.getItem("passes")) || []
+    );
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPass, setSelectedPass] = useState(null);
 
     const goldPrice = 799;
     const PlatinumPrice = 1699;
-    console.log(passes, "pass")
+    console.log(passes, "pass");
     const subtotal = passes.reduce((acc, pass) => acc + pass.price, 0);
 
     const openModal = (pass) => {
@@ -24,49 +26,52 @@ const Cart = () => {
     };
 
     const updatePass = (updatedPass) => {
-        const updatedPasses = passes.map(pass =>
-            pass.type === updatedPass.type
-                ? updatedPass
-                : pass
+        const updatedPasses = passes.map((pass) =>
+            pass.type === updatedPass.type ? updatedPass : pass
         );
         setPasses(updatedPasses);
-        localStorage.setItem('passes', JSON.stringify(updatedPasses));
+        localStorage.setItem("passes", JSON.stringify(updatedPasses));
     };
 
     useEffect(() => {
-        const savedPasses = JSON.parse(localStorage.getItem('passes')) || [];
+        const savedPasses = JSON.parse(localStorage.getItem("passes")) || [];
         setPasses(savedPasses);
     }, []);
 
     const handleDelete = (index) => {
         const updatedPasses = passes.filter((_, i) => i !== index);
         setPasses(updatedPasses);
-        localStorage.setItem('passes', JSON.stringify(updatedPasses));
+        localStorage.setItem("passes", JSON.stringify(updatedPasses));
     };
 
     return (
         <div>
             <div
                 style={{
-                    background: 'linear-gradient(90deg, rgba(15, 38, 51, 1) 0%, rgba(49, 38, 19, 1) 50%, rgba(47, 12, 12, 1) 100%)',
+                    background:
+                        "linear-gradient(90deg, rgba(15, 38, 51, 1) 0%, rgba(49, 38, 19, 1) 50%, rgba(47, 12, 12, 1) 100%)",
                 }}
             >
-                <div className='flex flex-row justify-between items-center p-5'>
-                    <img src={logo} alt='logo' className='h-[87px] ml-3' />
-                    <div className='flex gap-2 items-center text-white -pt-3'>
-                        <IoLocationOutline className='text-2xl' />
-                        <p className='text-lg'>Surat</p>
-                        <div className='ml-10'> <IoIosArrowDown /></div>
+                <div className="flex flex-row justify-between items-center p-5">
+                    <img src={logo} alt="logo" className="h-[87px] ml-3" />
+                    <div className="flex gap-2 items-center text-white -pt-3">
+                        <IoLocationOutline className="text-2xl" />
+                        <p className="text-lg">Surat</p>
+                        <div className="ml-10">
+                            {" "}
+                            <IoIosArrowDown />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className='px-5'>
+            <div className="px-5">
                 <div className="flex justify-between items-start gap-10">
-                    {/* Left Side */}
-                    {passes?.length === 0 && <div className='text-center flex justify-center items-center'>
-                        No pass Found
-                    </div>}
-                    {passes?.length > 0 &&
+                    {passes?.length === 0 && (
+                        <div className="text-center flex justify-center items-center">
+                            No pass Found
+                        </div>
+                    )}
+                    {passes?.length > 0 && (
                         <div className="w-3/4 rounded-lg ">
                             <div className="flex justify-between items-center bg-gray-300 p-3">
                                 <div className="w-1/2 text-lg font-semibold">Product</div>
@@ -78,47 +83,86 @@ const Cart = () => {
                             </div>
                             <div className="py-5 ">
                                 {passes?.map((pass, index) => (
-                                    <div key={index} className="flex items-center border py-8 px-3">
+                                    <div
+                                        key={index}
+                                        className="flex items-center border py-8 px-3"
+                                    >
                                         <div className="flex items-center gap-5 w-1/2">
-                                            <img src={gold} alt="gold" className="h-20 w-20 object-cover rounded" />
+                                            <img
+                                                src={pass.type === "Gold" ? gold : platinum}
+                                                alt="gold"
+                                                className="h-20 w-20 object-cover rounded-full"
+                                            />
                                             <div>
-                                                <p className="text-sm font-medium">Daily {pass.type} Tickets - Suvarn Navratri, Surat</p>
+                                                <p className="text-sm font-medium">
+                                                    Daily {pass.type} Tickets - Suvarn Navratri, Surat
+                                                </p>
+                                                {pass.selectedDates.length > 1 && (
+                                                    <div className="flex gap-4 items-center">
+                                                        <p className="text-sm text-gray-600">{pass.type}</p>
+                                                        <FaEdit
+                                                            className="text-gray-600 cursor-pointer"
+                                                            onClick={() => openModal(pass)}
+                                                        />
+                                                    </div>
+                                                )}
                                                 <div className="flex gap-4 items-center text-gray-600">
-                                                    <p>{pass.selectedDates.join(', ')}</p>
-                                                    <FaEdit className="text-black cursor-pointer" onClick={() => openModal(pass)} />
+                                                    <p>
+                                                        {pass.selectedDates.map((date, index) => (
+                                                            <p className="text-sm" key={index}>
+                                                                {date}
+                                                            </p>
+                                                        ))}
+                                                    </p>
+                                                    {pass.selectedDates.length <= 1 && (
+                                                        <FaEdit
+                                                            className="text-black cursor-pointer"
+                                                            onClick={() => openModal(pass)}
+                                                        />
+                                                    )}
                                                 </div>
                                                 <p className="text-gray-500">Suvarn Navratri</p>
                                             </div>
                                         </div>
                                         <div className="w-1/2 flex justify-between items-center">
-                                            <p className="text-lg font-semibold">Rs.{pass.type !== "Platinum" ? goldPrice : PlatinumPrice}</p>
+                                            <p className="text-lg font-semibold">
+                                                Rs.
+                                                {pass.type !== "Platinum" ? goldPrice : PlatinumPrice}
+                                            </p>
                                             <div className="w-[10%] border border-gray-300 flex gap-2 p-2 justify-center items-center rounded">
                                                 {/* <FaMinus className="text-black cursor-pointer" /> */}
-                                                <p className="text-black font-semibold">{pass.quantity}</p>
+                                                <p className="text-black font-semibold">
+                                                    {pass.quantity}
+                                                </p>
                                                 {/* <FaPlus className="text-black cursor-pointer" /> */}
                                             </div>
-                                            <p className="text-lg font-semibold">Rs. {pass.price}.00</p>
+                                            <p className="text-lg font-semibold">
+                                                Rs. {pass.price}.00
+                                            </p>
                                             <IoCloseSharp
-                                                className='text-xl cursor-pointer'
+                                                className="text-xl cursor-pointer"
                                                 onClick={() => handleDelete(index)}
                                             />
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </div>}
+                        </div>
+                    )}
 
                     <div className="w-1/4 mt-2 ">
-                        <h2 className="text-[12px] uppercase font-bold mb-4 border-b-2 border-black pb-2">Order Summary</h2>
-                        <div className='flex justify-between items-center text-[12px] border-b pb-1'>
-                            <p className='font-[500]'>SubTotal </p>
-                            <p className='font-bold'>Rs.{subtotal}</p>
+                        <h2 className="text-[12px] uppercase font-bold mb-4 border-b-2 border-black pb-2">
+                            Order Summary
+                        </h2>
+                        <div className="flex justify-between items-center text-[12px] border-b pb-1">
+                            <p className="font-[500]">SubTotal </p>
+                            <p className="font-bold">Rs.{subtotal}</p>
                         </div>
-                        <div className='flex justify-between items-center mt-2 text-[12px] border-y pt-2 pb-3'>
-                            <p className='font-[500] uppercase'>Total: </p>
-                            <p className='font-bold'>Rs.{subtotal}</p>
+                        <div className="flex justify-between items-center mt-2 text-[12px] border-y pt-2 pb-3">
+                            <p className="font-[500] uppercase">Total: </p>
+                            <p className="font-bold">Rs.{subtotal}</p>
                         </div>
-                        <Link to={'/checkout/123456778999'}>
+                        <Link to={"/checkout/123456778999"}>
                             <button className="mt-4 bg-[#232323] text-white font-semibold py-2 px-4 w-full rounded-sm hover:bg-gray-300 hover:text-black">
                                 Checkout
                             </button>

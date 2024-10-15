@@ -21,6 +21,6 @@ import managment from './managment.png'
 import gift from './gift.png'
 import footer from './footer-bg.webp'
 import gold from './gold.png'
+import platinum from './platinum.png'
 
-
-export { mainBg, logo, flogo, calender, sliderBg, s1, s2, s3, s4, s5, s6, gold, s7, eventBaner, off1, off2, off3, footer, gift, pass1, pass2, pass3, managment }
+export { mainBg, logo, flogo, calender, sliderBg, s1, s2, s3, platinum, s4, s5, s6, gold, s7, eventBaner, off1, off2, off3, footer, gift, pass1, pass2, pass3, managment }
