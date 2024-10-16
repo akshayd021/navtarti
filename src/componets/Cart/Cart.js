@@ -17,7 +17,6 @@ const Cart = () => {
 
     const goldPrice = 799;
     const PlatinumPrice = 1699;
-    console.log(passes, "pass");
     const subtotal = passes.reduce((acc, pass) => acc + pass.price, 0);
 
     const openModal = (pass) => {
@@ -127,7 +126,7 @@ const Cart = () => {
                                         <div className="w-1/2 flex justify-between items-center">
                                             <p className="text-lg font-semibold">
                                                 Rs.
-                                                {pass.type !== "Platinum" ? goldPrice : PlatinumPrice}
+                                                {pass.type === "Gold" ? goldPrice : PlatinumPrice}
                                             </p>
                                             <div className="w-[10%] border border-gray-300 flex gap-2 p-2 justify-center items-center rounded">
                                                 {/* <FaMinus className="text-black cursor-pointer" /> */}

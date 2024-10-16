@@ -1,5 +1,5 @@
 import { BiSolidOffer } from 'react-icons/bi';
-import { Cart, Checkout, Footer, MainHeader, Pass, PayNow } from './componets';
+import { AdminDashboard, Cart, Checkout, Footer, MainHeader, Pass, PayNow, SuperAdminDashboard } from './componets';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -16,6 +16,9 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout/:slug" element={<Checkout />} />
           <Route path="/pay/:slug" element={<PayNow />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/super-admin" element={<SuperAdminDashboard />} />
+
         </Routes>
       </Router>
       <Footer />

@@ -5,4 +5,6 @@ import Pass from "./Passes/Pass";
 import Cart from "./Cart/Cart";
 import Checkout from "./Checkout/Checkout";
 import PayNow from "./PayNow";
-export { MainHeader, Slider, Footer, Pass, Cart, Checkout , PayNow}
+import AdminDashboard from "./admin/MainAdmin";
+import SuperAdminDashboard from "./admin/SuperAdmin";
+export { MainHeader, Slider, Footer, Pass, Cart, Checkout, PayNow, AdminDashboard, SuperAdminDashboard }

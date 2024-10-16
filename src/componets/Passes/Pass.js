@@ -29,7 +29,7 @@ const Pass = () => {
     if (selectedDates.length > 1) {
       return Platinum ? DaysPlatinum : DaysGold;
     } else {
-      return (selecttype === "Platinum" ? PlatinumPrice : goldPrice) * quantity;
+      return (passType !== "Gold" ? PlatinumPrice : goldPrice) * quantity;
     }
   };
 
@@ -75,9 +75,10 @@ const Pass = () => {
         "http://192.168.29.219:5000/api/passes",
         passData
       );
+      
 
       let passes = JSON.parse(localStorage.getItem("passes")) || [];
-      passes.push(response.data);
+      passes.push(response?.data);
       localStorage.setItem("passes", JSON.stringify(passes));
       navigate("/cart");
     } catch (error) {
