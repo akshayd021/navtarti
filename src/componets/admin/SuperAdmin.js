@@ -157,12 +157,12 @@ const SuperAdminDashboard = () => {
                             return (
                                 <tr key={user._id} className="border-b hover:bg-gray-100">
                                     <td className="py-3 px-6">{index + 1}</td>
-                                    <td className="py-3 px-6">{user.firstName} {user.lastName}</td>
-                                    <td className="py-3 px-6">{user.mobile}</td>
-                                    <td className="py-3 px-6">{user.email}</td>
+                                    <td className="py-3 px-6">{user?.firstName} {user?.lastName}</td>
+                                    <td className="py-3 px-6">{user?.mobile}</td>
+                                    <td className="py-3 px-6">{user?.email}</td>
                                     <td className="py-3 px-6">{passDetails}</td>
-                                    <td className="py-3 px-6">₹{userTotalPayment.toFixed(2)}</td>
-                                    <td className="py-3 px-6 capitalize">{user.linkStatus}</td>
+                                    <td className="py-3 px-6">₹{userTotalPayment?.toFixed(2)}</td>
+                                    <td className="py-3 px-6 capitalize">{user?.linkStatus}</td>
                                 </tr>
                             );
                         })}

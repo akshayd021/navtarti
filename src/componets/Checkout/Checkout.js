@@ -1,19 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoLocationOutline } from "react-icons/io5";
 import { gold, logo, platinum } from "../../assets";
 import axios from "axios";
-import * as Yup from "yup"; // For validation
-import { useFormik } from "formik"; // For form handling
+import * as Yup from "yup";
+import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
+import _ from "lodash";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const [passes, setPasses] = useState(
     JSON.parse(localStorage.getItem("passes")) || []
   );
+  const groupedPasses = _.values(
+    passes.reduce((acc, pass) => {
+        const key = `${pass.type}-${pass.selectedDates.join(",")}`;
+        if (!acc[key]) {
+            acc[key] = { ...pass };
+        } else {
+            acc[key].quantity += pass.quantity;
+            acc[key].price += pass.price; 
+        }
+        return acc;
+    }, {})
+);
 
-  const subtotal = passes?.reduce((acc, pass) => acc + pass.price, 0);
+const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
 
   // Form validation schema
   const validationSchema = Yup.object({
@@ -36,29 +50,27 @@ const Checkout = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      const dummyLink = `https://example.com/link/${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+
       const payload = {
         ...values,
-        link: `https://example.com/link/${Math.random()
-          .toString(36)
-          .substr(2, 9)}`,
-        passes: passes,
+        passes: groupedPasses,
+        dummyLink, // Add dummyLink to payload
       };
-      console.log(passes, "pass from");
+
       try {
         const response = await axios.post(
           "http://192.168.29.219:5000/api/user/send-link",
           payload
         );
-        console.log("Payment link created:", response.data);
+        console.log("Payment link and email sent:", response.data);
 
-        if (response.data.link) {
-          navigate(`/admin`);
-        } else {
-          alert("No link received. Please try again.");
-        }
+        navigate(`/admin`);
       } catch (error) {
-        console.error("Error creating payment link:", error);
-        alert("There was an error creating the payment link.");
+        console.error("Error sending payment link or email:", error);
+        alert("There was an error sending the payment link.");
       }
     },
   });
@@ -166,7 +178,7 @@ const Checkout = () => {
           </div>
 
           <div className="w-1/2 bg-[#F5F5F5] px-4 py-5 h-screen border-l border-l-gray-300">
-            {passes?.map((pass, i) => (
+            {groupedPasses?.map((pass, i) => (
               <div
                 key={i}
                 className="flex items-center gap-5 mt-4 border-b border-b-gray-300 pb-2"
@@ -187,13 +199,13 @@ const Checkout = () => {
                   </p>
                   <div
                     className={` ${pass.selectedDates?.length > 1 ? "block" : "flex"
-                      } gap-3`}
+                      } gap-3 items-center`}
                   >
                     <p>{pass.type === "Gold" ? "Gold" : "Platinum"}</p>
                     <p>
                       {pass.selectedDates.map((date, index) => (
                         <p className="text-sm" key={index}>
-                          {date}
+                        {moment(date).format("DD/MM/YYYY")}
                         </p>
                       ))}
                     </p>
@@ -218,7 +230,7 @@ const Checkout = () => {
             <div className="flex justify-between items-center gap-3 mt-5">
               <h4>
                 SubTotal:{" "}
-                <span className="font-semibold">{passes?.length}</span> items
+                <span className="font-semibold">{groupedPasses?.length}</span> items
               </h4>
               <p className="text-lg font-bold">₹{subtotal}.00</p>
             </div>

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaPhoneAlt, FaEnvelope, FaRupeeSign } from 'react-icons/fa';
-import { Link, useNavigate } from "react-router-dom";
+import { FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsersWithPasses = async () => {
@@ -43,6 +42,24 @@ const AdminDashboard = () => {
     }
   };
 
+  const handlePassAction = async (userId, passId, date, action) => {
+    try {
+      const response = await axios.post(`http://192.168.29.219:5000/api/user/verify-pass`, {
+        userId,
+        passId,
+        date,
+        action,
+      });
+
+      if (response.data.success) {
+        alert(`Pass for date ${new Date(date).toLocaleDateString()} has been ${action === 'accept' ? 'accepted' : 'rejected'}`);
+      }
+    } catch (error) {
+      console.error("Error processing pass action:", error);
+      alert("Failed to process pass action");
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -59,14 +76,9 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
         {users.map((user) => {
-          const totalPayment = user.passes?.reduce(
-            (acc, pass) => acc + pass.price * pass.quantity,
-            0
-          );
-
           return (
             <div key={user._id} className="bg-white shadow-lg rounded-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-              
+
               {/* Link Status */}
               {user.linkStatus === 'pending' && (
                 <div className="flex gap-4 mb-4">
@@ -108,20 +120,6 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Pass Information */}
-                <div className="mt-6 border-t pt-4">
-                  <h3 className="text-lg font-semibold text-gray-600">Pass Information</h3>
-                  <div className="flex items-center mt-2">
-                    <FaRupeeSign className="text-green-500" />
-                    {user.passes.length > 0 ? (
-                      <span className="text-lg text-gray-800 font-semibold">
-                        ₹{totalPayment.toFixed(2)}
-                      </span>
-                    ) : (
-                      <span className="text-gray-500">No passes available</span>
-                    )}
-                  </div>
-                </div>
-
                 {user.passes.length > 0 && (
                   user.passes.map((pass) => (
                     <div key={pass._id} className="mt-4 p-4 bg-gray-50 rounded-lg border">
@@ -143,9 +141,26 @@ const AdminDashboard = () => {
                         <span className="text-sm text-gray-500">Dates</span>
                         <div className="flex flex-wrap gap-2">
                           {pass.selectedDates.map((date, index) => (
-                            <span key={index} className="text-gray-800 text-sm">
-                              {new Date(date).toLocaleDateString()}
-                            </span>
+                            <div key={index} className="flex justify-between items-center gap-4">
+                              <span className="text-gray-800 text-sm">
+                                {new Date(date).toLocaleDateString()}
+                              </span>
+                              {/* Accept or Reject button for each date */}
+                              <div className="flex gap-2">
+                                <button
+                                  className="bg-green-400 hover:bg-green-500 text-white px-4 py-2 rounded-lg"
+                                  onClick={() => handlePassAction(user._id, pass._id, date, 'accept')}
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  className="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-lg"
+                                  onClick={() => handlePassAction(user._id, pass._id, date, 'reject')}
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>

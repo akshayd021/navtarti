@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { gold, platinum } from '../../assets';
+import moment from 'moment';
 
 const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
     const [quantity, setQuantity] = useState(pass.quantity);
@@ -65,7 +66,7 @@ const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
                                     checked={selectedDates.includes(date)}
                                     onChange={() => handleDateChange(date)}
                                 />
-                                <label className="ml-2">{date}</label>
+                                <label className="ml-2">{moment(date).format("DD/MM/YYYY")}</label>
                             </div>
                         ))}
                     </div>

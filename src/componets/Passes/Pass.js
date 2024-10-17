@@ -75,8 +75,6 @@ const Pass = () => {
         "http://192.168.29.219:5000/api/passes",
         passData
       );
-      
-
       let passes = JSON.parse(localStorage.getItem("passes")) || [];
       passes.push(response?.data);
       localStorage.setItem("passes", JSON.stringify(passes));
@@ -173,9 +171,7 @@ const Pass = () => {
                       onChange={() => handleDateSelect(date)} // Change to onChange
                     />
                     <button
-                      className={`text-black py-4 font-semibold ${
-                        selectedDates.includes(date) ? "bg-gray-300" : ""
-                      }`}
+                      className={`text-black py-4 font-semibold`}
                       onClick={() => handleDateSelect(date)}
                     >
                       {date}
