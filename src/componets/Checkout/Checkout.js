@@ -16,18 +16,18 @@ const Checkout = () => {
   );
   const groupedPasses = _.values(
     passes.reduce((acc, pass) => {
-        const key = `${pass.type}-${pass.selectedDates.join(",")}`;
-        if (!acc[key]) {
-            acc[key] = { ...pass };
-        } else {
-            acc[key].quantity += pass.quantity;
-            acc[key].price += pass.price; 
-        }
-        return acc;
+      const key = `${pass.type}-${pass.selectedDates.join(",")}`;
+      if (!acc[key]) {
+        acc[key] = { ...pass };
+      } else {
+        acc[key].quantity += pass.quantity;
+        acc[key].price += pass.price;
+      }
+      return acc;
     }, {})
-);
+  );
 
-const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
+  const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
 
   // Form validation schema
   const validationSchema = Yup.object({
@@ -50,24 +50,20 @@ const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
     },
     validationSchema,
     onSubmit: async (values) => {
-      const dummyLink = `https://example.com/link/${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
-
       const payload = {
         ...values,
+        email: values?.email,
         passes: groupedPasses,
-        dummyLink, // Add dummyLink to payload
+        _id: groupedPasses?.map((x) => x?._id)
       };
 
       try {
         const response = await axios.post(
-          "http://192.168.29.219:5000/api/user/send-link",
+          "http://192.168.29.219:5000/api//pass/send-mail",
           payload
         );
         console.log("Payment link and email sent:", response.data);
-
-        navigate(`/admin`);
+        localStorage.clear()
       } catch (error) {
         console.error("Error sending payment link or email:", error);
         alert("There was an error sending the payment link.");
@@ -106,6 +102,7 @@ const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
                 type="text"
                 placeholder="First Name"
                 name="firstName"
+                defaultValue={"akshay"}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.firstName}
@@ -119,6 +116,7 @@ const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
                 placeholder="Last Name"
                 name="lastName"
                 onChange={formik.handleChange}
+                defaultValue={"aasd"}
                 onBlur={formik.handleBlur}
                 value={formik.values.lastName}
                 className="mt-4 border px-5 py-2 w-full rounded-md"
@@ -132,6 +130,7 @@ const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
                 type="email"
                 placeholder="Enter Email"
                 name="email"
+                defaultValue={'aksha2004vbi@gmail.com'}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.email}
@@ -145,6 +144,7 @@ const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
                 placeholder="Enter Mobile Number"
                 name="mobile"
                 onChange={formik.handleChange}
+                defaultValue={"123"}
                 onBlur={formik.handleBlur}
                 value={formik.values.mobile}
                 className="mt-4 border px-5 py-2 w-full rounded-md"
@@ -205,7 +205,7 @@ const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
                     <p>
                       {pass.selectedDates.map((date, index) => (
                         <p className="text-sm" key={index}>
-                        {moment(date).format("DD/MM/YYYY")}
+                          {moment(date).format("DD/MM/YYYY")}
                         </p>
                       ))}
                     </p>

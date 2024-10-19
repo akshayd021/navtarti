@@ -16,7 +16,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout/:slug" element={<Checkout />} />
           <Route path="/pay/:slug" element={<PayNow />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/pass/:id" element={<AdminDashboard />} />
           <Route path="/admin/super-admin" element={<SuperAdminDashboard />} />
 
         </Routes>

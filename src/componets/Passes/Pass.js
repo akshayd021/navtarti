@@ -25,6 +25,7 @@ const Pass = () => {
   const handleQuantityChange = (change) => {
     setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
   };
+
   const total = () => {
     if (selectedDates.length > 1) {
       return Platinum ? DaysPlatinum : DaysGold;
@@ -34,7 +35,7 @@ const Pass = () => {
   };
 
   const subtotal = total();
-  console.log(subtotal);
+
   const handleDateSelect = (date) => {
     if (passType === "3-Day Combo") {
       if (selectedDates.includes(date)) {
@@ -52,21 +53,18 @@ const Pass = () => {
   };
 
   const handleBuyNow = async () => {
-    if (passType === "3-Day Combo" && selectedDates.length === 0) {
+    if (
+      (passType === "3-Day Combo" && selectedDates.length === 0) ||
+      (passType !== "3-Day Combo" && !selectedDate)
+    ) {
       alert("Please select at least 1 date.");
       return;
     }
 
     const passData = {
-      type:
-        passType === "3-Day Combo"
-          ? selecttype
-          : Platinum
-          ? "Platinum"
-          : "Gold",
+      type: passType === "3-Day Combo" ? selecttype : Platinum ? "Platinum" : "Gold",
       quantity,
-      selectedDates:
-        passType === "3-Day Combo" ? selectedDates : [selectedDate],
+      selectedDates: passType === "3-Day Combo" ? selectedDates : [selectedDate],
       price: subtotal,
     };
 
@@ -85,6 +83,7 @@ const Pass = () => {
     }
   };
 
+
   return (
     <div className="">
       <div
@@ -93,7 +92,7 @@ const Pass = () => {
             "linear-gradient(90deg, rgba(15, 38, 51, 1) 0%, rgba(49, 38, 19, 1) 50%, rgba(47, 12, 12, 1) 100%)",
         }}
       >
-        <div className="flex flex-row justify-between items-center p-5">
+      <div className="flex flex-row justify-between items-center p-5">
           <img src={logo} alt="logo" className="h-[87px] ml-3" />
           <div className="flex gap-2 items-center text-white -pt-3">
             <IoLocationOutline className="text-2xl" />
@@ -103,6 +102,7 @@ const Pass = () => {
             </div>
           </div>
         </div>
+
       </div>
 
       <div className="mt-5 text-left px-5 mb-10">
@@ -120,6 +120,7 @@ const Pass = () => {
             : DaysPlatinum}
           .00
         </h4>
+
         {passType !== "3-Day Combo" && (
           <>
             <h6 className="mt-8 text-[20px] font-semibold text-[#232323]">
@@ -143,10 +144,10 @@ const Pass = () => {
         </h6>
         <div className="flex gap-6 items-center">
           {[
-            "Day-7 11 Oct / Fri",
-            "Day-8 12 Oct / Sat",
-            "Day-9 13 Oct / Sun",
-            "Day-10 14 Oct / Mon",
+            "11/10/2024",
+            "12/10/2024",
+            "13/10/2024",
+            "14/10/2024",
           ].map((date) => (
             <div
               key={date}

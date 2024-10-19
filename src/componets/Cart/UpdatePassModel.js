@@ -2,25 +2,49 @@ import React, { useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { gold, platinum } from '../../assets';
 import moment from 'moment';
+import axios from 'axios'; // Import axios
 
 const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
     const [quantity, setQuantity] = useState(pass.quantity);
     const [selectedDates, setSelectedDates] = useState(pass.selectedDates);
     const [selectType, setSelectType] = useState(pass.type);
+    const [updatePass, setUpdatePass] = useState([])
     const goldPrice = 799;
     const platinumPrice = 1699;
+    console.log(selectedDates, "pSS")
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
+        // const updatedSelectedDates = selectedDates.map((d) => {
+        //     const existingDate = pass.selectedDates.find(sd => sd.date === d.date);
+        //     return existingDate ? { ...existingDate, status: "pending" } : { date: d?.date, status: "pending" };
+        // });
+
         const updatedPass = {
-            ...pass,
+            _id: pass._id, // Pass ID
             type: selectType,
             quantity,
-            selectedDates,
-            price: (selectType === 'Platinum' ? platinumPrice : goldPrice) * quantity * selectedDates.length,
+            // selectedDates: updatedSelectedDates, // Use the corrected selectedDates
+            // price: (selectType === 'Platinum' ? platinumPrice : goldPrice) * quantity * updatedSelectedDates.length,
         };
-        onUpdate(updatedPass);
-        onClose();
+
+        try {
+            const response = await axios.put('http://192.168.29.219:5000/api/pass/update-pass', updatedPass, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            console.log('Pass updated successfully:', response?.data);
+            setUpdatePass(response?.data?.pass)
+            onUpdate(response.data);
+            onClose();
+
+        } catch (error) {
+            console.error('Error updating pass:', error.response ? error.response.data : error.message);
+        }
     };
+
+
 
     const increase = () => {
         setQuantity(quantity + 1);
@@ -40,6 +64,7 @@ const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 w-96">
                 <h2 className="text-lg font-bold">Update Pass</h2>
+                {updatePass}
                 <div className="flex items-center mt-4">
                     <img src={pass.type === 'Platinum' ? platinum : gold} alt={pass.type} className="h-20 w-20 object-cover rounded" />
                     <div className="ml-4">
@@ -50,11 +75,11 @@ const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
                 <label className="block mt-4">
                     Quantity:
                 </label>
-                    <div className="w-[25%] border mt-3 border-gray-300 flex gap-2 p-2 justify-between items-center rounded">
-                        <FaMinus className="text-black cursor-pointer" onClick={decrease} />
-                        <p className="text-black font-semibold">{quantity}</p>
-                        <FaPlus className="text-black cursor-pointer" onClick={increase} />
-                    </div>
+                <div className="w-[25%] border mt-3 border-gray-300 flex gap-2 p-2 justify-between items-center rounded">
+                    <FaMinus className="text-black cursor-pointer" onClick={decrease} />
+                    <p className="text-black font-semibold">{quantity}</p>
+                    <FaPlus className="text-black cursor-pointer" onClick={increase} />
+                </div>
 
                 {selectType === '3-Day Combo' ? (
                     <div className="mt-4">
