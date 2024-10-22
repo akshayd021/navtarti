@@ -8,6 +8,8 @@ import {
 } from "react-icons/fa";
 import _ from "lodash";
 import moment from "moment";
+import { Link } from "react-router-dom";
+import { useDates } from "../../context/dateContext";
 
 const SuperAdminDashboard = () => {
   const [passes, setPass] = useState([]);
@@ -19,6 +21,7 @@ const SuperAdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [status, setStatus] = useState("");
+  const { submittedDates } = useDates(); // Access dates from the context
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,7 +73,9 @@ const SuperAdminDashboard = () => {
         return (
           _.includes(pass.type.toLowerCase(), lowercasedQuery) || // Search by type
           _.includes(pass.price.toString(), lowercasedQuery) || // Search by price
-          _.includes(pass.quantity.toString(), lowercasedQuery) || // Search by quantity
+          _.includes(pass.quantity.toString(), lowercasedQuery) || 
+          _.includes(pass.firstName.toString(), lowercasedQuery) ||// Search by quantity
+          _.includes(pass.lastName.toString(), lowercasedQuery) ||
           _.includes(moment(pass.date).format("DD/MM/YYYY"), lowercasedQuery) // Search by date
         );
       });
@@ -108,6 +113,8 @@ const SuperAdminDashboard = () => {
     setStatus(status);
     applyFilters(passes, searchQuery, selectedDate, status);
   };
+
+  console.log("filer", passes)
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -159,12 +166,17 @@ const SuperAdminDashboard = () => {
           <FaSearch className="absolute left-3 top-3 text-gray-500" />
           <input
             type="text"
-            placeholder="Search Passes by Type, Price, Quantity or Date"
+            placeholder="Search Passes by Type, UserName, Price, Quantity or Date"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <Link to={"/admin/add-event"} >
+        Add Event </Link>
+        <Link to={"/admin/create-pass"} >
+        Add Pass </Link>
+       
         <div className="flex items-center gap-3">
           <select
             onChange={(e) => handleStatus(e.target.value)}
@@ -182,14 +194,16 @@ const SuperAdminDashboard = () => {
               className="pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Filter by Date</option>
-              <option value="12/10/2024">12 Oct 2024</option>
-              <option value="13/10/2024">13 Oct 2024</option>
-              <option value="14/10/2024">14 Oct 2024</option>
-              <option value="15/10/2024">15Oct 2024</option>
+              {submittedDates?.map((date, i)=>(
+
+              <option value={moment(date?.date).format('DD/MM/YYYY')}>{moment(date?.date).format('DD/MM/YYYY')}</option>
+              ))}
+      
             </select>
           </div>
         </div>
       </div>
+      {console.log(submittedDates, "submit")}
 
       {/* User Table */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
@@ -199,6 +213,9 @@ const SuperAdminDashboard = () => {
               <th className="py-3 px-6 text-gray-700 font-bold text-left">#</th>
               <th className="py-3 px-6 text-gray-700 font-bold text-left">
                 Type
+              </th>
+              <th className="py-3 px-6 text-gray-700 font-bold text-left">
+                User Name
               </th>
               <th className="py-3 px-6 text-gray-700 font-bold text-left">
                 Quantity
@@ -226,6 +243,7 @@ const SuperAdminDashboard = () => {
                 <tr key={pass._id} className="border-b border-gray-200">
                   <td className="py-3 px-6">{idx + 1}</td>
                   <td className="py-3 px-6">{pass.type}</td>
+                  <td className="py-3 px-6">{pass.firstName ||"not"} {pass.lastName}</td>
                   <td className="py-3 px-6">{pass.quantity}</td>
                   <td className="py-3 px-6">₹{pass.price.toFixed(2)}</td>
                   <td className="py-3 px-6">

@@ -4,7 +4,7 @@ import { IoLocationOutline } from "react-icons/io5";
 import { gold, logo, platinum } from "../../assets";
 import { FaEdit } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UpdatePassModal from "./UpdatePassModel";
 import moment from "moment";
 import _ from "lodash"; // for lodash grouping
@@ -13,27 +13,38 @@ const Cart = () => {
   const [passes, setPasses] = useState(
     JSON.parse(localStorage.getItem("passes")) || []
   );
+
+const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
 
-  const goldPrice = 799;
-  const PlatinumPrice = 1699;
 
-  // Group passes by selectedDates and type, and sum their quantities
-  const groupedPasses = _.values(
-    passes.reduce((acc, pass) => {
-      const key = `${pass.type}-${pass.selectedDates.join(",")}`;
-      if (!acc[key]) {
-        acc[key] = { ...pass };
-      } else {
-        acc[key].quantity += pass.quantity;
-        acc[key].price += pass.price;
-      }
-      return acc;
-    }, {})
-  );
 
-  const subtotal = groupedPasses.reduce((acc, pass) => acc + pass.price, 0);
+  const goBack = () => {
+    navigate(-1); // This will go back to the previous page
+  };
+
+const groupedPasses = _.values(
+  passes.reduce((acc, pass) => {
+    const key = `${pass.type}-${pass.selectedDates ? pass.selectedDates.join(",") : ""}`;
+    if (!acc[key]) {
+      acc[key] = { ...pass };
+    } else {
+      acc[key].quantity += pass.quantity;
+      acc[key].price += pass.price;
+    }
+    return acc;
+  }, {})
+);
+
+
+const passId = groupedPasses?.map((x)=>x?._id)
+
+
+const total = () => {
+  return passes ? passes.map((x) =>(x?.price * x.quantity )) : 0
+};
+const subtotal = total()
 
   const openModal = (pass) => {
     setSelectedPass(pass);
@@ -42,15 +53,15 @@ const Cart = () => {
 
   const updatePass = (updatedPass) => {
     const updatedPasses = passes.map((pass) =>
-      pass.type === updatedPass.type &&
-      pass.selectedDates.toString() === updatedPass.selectedDates.toString()
+      pass.type === updatedPass.type && _.isEqual(pass.selectedDates, updatedPass.selectedDates)
         ? updatedPass
         : pass
     );
-    setPasses(updatedPasses);
-    localStorage.setItem("passes", JSON.stringify(updatedPasses));
+    
+    setPasses(updatedPasses); // Update the state with the modified passes array
+    localStorage.setItem("passes", JSON.stringify(updatedPasses)); // Persist updated passes in localStorage
   };
-
+  
   useEffect(() => {
     const savedPasses = JSON.parse(localStorage.getItem("passes")) || [];
     setPasses(savedPasses);
@@ -83,12 +94,12 @@ const Cart = () => {
       </div>
       <div className="px-5">
         <div className="flex justify-between items-start gap-10">
-          {groupedPasses?.length === 0 && (
+          {groupedPasses && groupedPasses?.length === 0 && (
             <div className="text-center flex justify-center items-center">
               No pass Found
             </div>
           )}
-          {groupedPasses?.length > 0 && (
+          {groupedPasses && groupedPasses?.length > 0 && (
             <div className="w-3/4 rounded-lg ">
               <div className="flex justify-between items-center bg-gray-300 p-3">
                 <div className="w-1/2 text-lg font-semibold">Product</div>
@@ -99,7 +110,7 @@ const Cart = () => {
                 </div>
               </div>
               <div className="py-5 ">
-                {groupedPasses?.map((pass, index) => (
+                {groupedPasses && groupedPasses?.map((pass, index) => (
                   <div
                     key={index}
                     className="flex items-center border py-8 px-3"
@@ -114,7 +125,7 @@ const Cart = () => {
                         <p className="text-sm font-medium">
                           Daily {pass.type} Tickets - Suvarn Navratri, Surat
                         </p>
-                        {pass.selectedDates.length > 1 && (
+                        {pass.selectedDates && pass.selectedDates.length > 1 && (
                           <div className="flex gap-4 items-center">
                             <p className="text-sm text-gray-600">{pass.type}</p>
                             <FaEdit
@@ -125,16 +136,16 @@ const Cart = () => {
                         )}
                         <div className="flex gap-4 items-center text-gray-600">
                           <p>
-                            {pass.selectedDates.map((x, index) => (
+                            { pass.selectedDates && pass.selectedDates.map((x, index) => (
                               <p className="text-sm" key={index}>
                                 {moment(x?.date).format("DD/MM/YYYY")}
                               </p>
                             ))}
                           </p>
-                          {pass.selectedDates.length <= 1 && (
+                          {pass.selectedDates &&  pass.selectedDates.length <= 1 && (
                             <FaEdit
                               className="text-black cursor-pointer"
-                              onClick={() => openModal(pass)}
+                              onClick={() => goBack()}
                             />
                           )}
                         </div>
@@ -144,7 +155,7 @@ const Cart = () => {
                     <div className="w-1/2 flex justify-between items-center">
                       <p className="text-lg font-semibold">
                         Rs.
-                        {pass.type === "Gold" ? goldPrice : PlatinumPrice}
+                        {pass.price}
                       </p>
                       <div className="w-[10%] border border-gray-300 flex gap-2 p-2 justify-center items-center rounded">
                         <p className="text-black font-semibold">
@@ -152,7 +163,7 @@ const Cart = () => {
                         </p>
                       </div>
                       <p className="text-lg font-semibold">
-                        Rs. {pass.price}.00
+                        Rs. {subtotal}.00
                       </p>
                       <IoCloseSharp
                         className="text-xl cursor-pointer"
@@ -177,7 +188,7 @@ const Cart = () => {
               <p className="font-[500] uppercase">Total: </p>
               <p className="font-bold">Rs.{subtotal}</p>
             </div>
-            <Link to={"/checkout/123456778999"}>
+            <Link to={`/checkout/${passId}`}>
               <button className="mt-4 bg-[#232323] text-white font-semibold py-2 px-4 w-full rounded-sm hover:bg-gray-300 hover:text-black">
                 Checkout
               </button>

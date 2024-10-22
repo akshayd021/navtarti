@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 
 const UserDashboard = () => {
-  const { id } = useParams(); // Get user ID from URL
+  const { id } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { gold, platinum } from '../../assets';
 import moment from 'moment';
@@ -36,6 +36,7 @@ const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
 
             console.log('Pass updated successfully:', response?.data);
             setUpdatePass(response?.data?.pass)
+            localStorage.setItem("passes", JSON.stringify(response?.data?.pass));
             onUpdate(response.data);
             onClose();
 
@@ -60,6 +61,8 @@ const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
         );
     };
 
+
+  
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 w-96">
