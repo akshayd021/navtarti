@@ -14,6 +14,7 @@ import AddDates from "./componets/admin/AddDates";
 import { DatesProvider } from "./context/dateContext";
 import CreatePass from "./componets/admin/CreatePass";
 import { PassProvider } from "./context/AddminPassContext";
+import { Login, SignUp } from "./auth";
 
 function App() {
   return (
@@ -26,8 +27,10 @@ function App() {
             </button>
 
             <Routes>
-              <Route path="/" element={<MainHeader />} />
-              <Route path="/products/:id" element={<Pass />} />
+            <Route path="/" element={<MainHeader />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/products/:id" element={<Pass />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout/:id" element={<Checkout />} />
               <Route path="/pay/:slug" element={<PayNow />} />

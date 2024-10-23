@@ -9,7 +9,7 @@ export const PassProvider = ({children}) =>{
 
     const fetchPasses= async () => {
         try {
-            const response = await axios.get("http://192.168.29.219:5000/api/admin/get-passes");
+            const response = await axios.get(`${process.env.REACT_APP_URL}/api/admin/get-passes`);
           setPasses(response?.data);
         } catch (error) {
           console.error("Error fetching dates:", error);

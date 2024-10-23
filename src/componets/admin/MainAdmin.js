@@ -14,7 +14,7 @@ const UserDashboard = () => {
     const fetchUserWithPasses = async () => {
       try {
         const userResponse = await axios.get(
-          `http://192.168.29.219:5000/api/get-pass/${id}`
+          `${process.env.REACT_APP_URL}/api/get-pass/${id}`
         );
         // Set the user data correctly based on the response structure
         setUser(userResponse?.data?.pass); // The pass is inside `data.pass`
@@ -33,7 +33,7 @@ const UserDashboard = () => {
     try {
       setExtra(true)
       const response = await axios.post(
-        `http://192.168.29.219:5000/api/pass/update-action`,
+        `${process.env.REACT_APP_URL}/api/pass/update-action`,
         {
           dateId,  // Pass the correct dateId
           action,  // Pass the action (accept or reject)

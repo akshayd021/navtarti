@@ -17,7 +17,7 @@ const Checkout = () => {
     const fetchUserWithPasses = async () => {
       try {
         const userResponse = await axios.get(
-          `http://192.168.29.219:5000/api/get-pass/${id}`
+          `${process.env.REACT_APP_URL}/api/get-pass/${id}`
         );
 
         console.log("API Response:", userResponse.data);
@@ -99,7 +99,7 @@ const Checkout = () => {
       
       try {
         const response = await axios.post(
-          "http://192.168.29.219:5000/api/pass/send-mail",
+          `${process.env.REACT_APP_URL}/api/pass/send-mail`,
           payload
         );
         console.log("Payment link and email sent:", response.data);

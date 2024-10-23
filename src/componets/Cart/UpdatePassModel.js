@@ -28,7 +28,7 @@ const UpdatePassModal = ({ pass, onClose, onUpdate }) => {
         };
 
         try {
-            const response = await axios.put('http://192.168.29.219:5000/api/pass/update-pass', updatedPass, {
+            const response = await axios.put(`${process.env.REACT_APP_URL}/api/pass/update-pass`, updatedPass, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

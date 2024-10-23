@@ -19,13 +19,13 @@ const AddDates = () => {
   // Fetch existing dates when the component mounts
   const fetchDates = async () => {
     try {
-      const response = await axios.get("http://192.168.29.219:5000/api/dates");
+      const response = await axios.get(`${process.env.REACT_APP_URL}/api/dates`);
       setSubmittedDates(response.data);
     } catch (error) {
       console.error("Error fetching dates:", error);
     }
   };
-
+console.log(process.env.URL,"url")
   useEffect(() => {
     fetchDates();
   }, [editValue]);
@@ -46,35 +46,41 @@ const AddDates = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Check if all dates are filled in
     const validDates = dates.filter((date) => date !== "");
-  
+
     if (validDates.length === 0) {
       console.error("No valid dates to submit.");
       return;
     }
-  
+
     try {
       const submissionPromises = validDates.map(async (date) => {
-        const response = await axios.post("http://192.168.29.219:5000/api/create-date", { date });
+        const response = await axios.post(
+          `${process.env.REACT_APP_URL}/api/create-date`,
+          { date }
+        );
         return response.data; // Return the response for each date
       });
-  
+
       const submitted = await Promise.all(submissionPromises);
-  
+
       setSubmittedDates([...submittedDates, ...submitted]);
-  
+
       setDates([""]);
     } catch (error) {
       console.error("Error submitting dates:", error);
     }
   };
-  
+
   // Update date
   const handleUpdateDate = async (id) => {
     try {
-      const response = await axios.put(`http://192.168.29.219:5000/api/dates/${id}`, { date: editValue });
+      const response = await axios.put(
+        `${process.env.REACT_APP_URL}/api/dates/${id}`,
+        { date: editValue }
+      );
       const updatedDates = submittedDates.map((date) =>
         date._id === id ? { ...date, date: response.data.date } : date
       );
@@ -89,7 +95,8 @@ const AddDates = () => {
   // Delete date
   const handleDeleteDate = async (id) => {
     try {
-      await axios.delete(`http://192.168.29.219:5000/api/dates/${id}`);
+
+      await axios.delete(`${process.env.REACT_APP_URL}/api/dates/${id}`);
       const updatedDates = submittedDates.filter((date) => date._id !== id);
       setSubmittedDates(updatedDates);
     } catch (error) {
@@ -99,7 +106,9 @@ const AddDates = () => {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Add Dates</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+        Add Dates
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {dates.map((date, index) => (
@@ -132,10 +141,15 @@ const AddDates = () => {
       {/* Display Submitted Dates */}
       {submittedDates.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Submitted Dates</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Submitted Dates
+          </h2>
           <ul className="space-y-4">
             {submittedDates.map((date, index) => (
-              <li key={index} className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm">
+              <li
+                key={index}
+                className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm"
+              >
                 {editIndex === date._id ? (
                   <div className="flex-grow">
                     <input
@@ -147,7 +161,9 @@ const AddDates = () => {
                     />
                   </div>
                 ) : (
-                  <span className="text-gray-700">{formatDate(new Date(date.date))}</span>
+                  <span className="text-gray-700">
+                    {formatDate(new Date(date.date))}
+                  </span>
                 )}
 
                 <div className="flex items-center space-x-2">

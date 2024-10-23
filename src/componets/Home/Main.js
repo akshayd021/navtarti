@@ -10,7 +10,8 @@ import {
   off2,
   off3,
   pass1,
-
+  pass2,
+  pass3,
 } from "../../assets";
 import { IoLocationOutline } from "react-icons/io5";
 import { FaCartShopping } from "react-icons/fa6";
@@ -21,13 +22,12 @@ import { Link } from "react-router-dom";
 import { useAdminPass } from "../../context/AddminPassContext";
 
 const MainHeader = () => {
-    const { passes, fetchPasses } = useAdminPass();
+  const { passes, fetchPasses } = useAdminPass();
 
-    useEffect(()=>{
-        fetchPasses()
-    },[])
-    const sortedPasses = [...passes].sort((a, b) => a.price - b.price);
-
+  useEffect(() => {
+    fetchPasses();
+  }, []);
+  const sortedPasses = [...passes].sort((a, b) => a.price - b.price);
 
   return (
     <div>
@@ -157,49 +157,76 @@ const MainHeader = () => {
         </div>
       </div>
       <div className="flex justify-center flex-wrap items-center mt-10 gap-10 mx-auto">
-      {sortedPasses?.map((pass) => (
-        <Link
-          to={`${pass?.discount > 1 ? "/products/3-days-combo" :`/products/${pass?._id}`}`}
-          key={pass._id}
-        >
+        {sortedPasses?.map((pass) => (
+          <>
+          <Link
+            to={`${
+              pass?.discount > 1
+                ? "/products/3-days-combo"
+                : `/products/${pass?._id}`
+            }`}
+            key={pass._id}
+          >
+            <div
+              className="bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4"
+              style={{ backgroundImage: `url(${pass1})` }} // Background image
+            >
+              <h4 className="text-[#8400b0] mt-1 text-[23px] font-bold capitalize">
+                {pass.type} pass
+              </h4>
+              <p className="text-[12px] text-[#343434] mt-1">
+                {pass.description ||
+                  "Enjoy closer proximity to the performances."}
+              </p>
+              <h4 className="text-[#191203] text-[26px] mt-1 font-bold">
+                Rs. {pass.price}
+              </h4>
+              <button className="bg-[#ccc] mt-1 px-[12px] py-1 text-[18px] rounded-lg text-[#232323]">
+                Book Now
+              </button>
+            </div>
+          </Link>
+          <Link to={`/products/3-days-combo`}>
           <div
-            className="bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4"
-            style={{ backgroundImage: `url(${pass1})` }} // Background image
+            className="bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4 mx-auto my-10"
+            style={{ backgroundImage: `url(${pass2})` }}
           >
             <h4 className="text-[#8400b0] mt-1 text-[23px] font-bold capitalize">
-              {pass.type} pass
+              3 Days Combo
             </h4>
             <p className="text-[12px] text-[#343434] mt-1">
-              {pass.description || "Enjoy closer proximity to the performances."}
+              {" "}
+              Get ready for non-stop Garba magical nights!
             </p>
-            <h4 className="text-[#191203] text-[26px] mt-1 font-bold">
-              Rs. {pass.price}
-            </h4>
+            <h4 className="text-[#191203] text-[26px] mt-1 font-bold">Rs.2499</h4>
             <button className="bg-[#ccc] mt-1 px-[12px] py-1 text-[18px] rounded-lg text-[#232323]">
               Book Now
             </button>
           </div>
         </Link>
-      ))}
-    </div>
-      {/* <Link to={`/products/ultimate-3-day-combo-tickets-suvarn-navratri-surat`}>
-        <div
-          className="bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4 mx-auto my-10"
-          style={{ backgroundImage: `url(${pass3})` }}
-        >
-          <h4 className="text-[#8400b0] mt-1 text-[23px] font-bold capitalize">
-            3 Days Combo
-          </h4>
-          <p className="text-[12px] text-[#343434] mt-1">
-            {" "}
-            Get ready for non-stop Garba magical nights!
-          </p>
-          <h4 className="text-[#191203] text-[26px] mt-1 font-bold">Rs.2499</h4>
-          <button className="bg-[#ccc] mt-1 px-[12px] py-1 text-[18px] rounded-lg text-[#232323]">
-            Book Now
-          </button>
-        </div>
-      </Link> */}
+        <Link to={`/products/5-days-combo`}>
+          <div
+            className="bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4 mx-auto my-10"
+            style={{ backgroundImage: `url(${pass3})` }}
+          >
+            <h4 className="text-[#8400b0] mt-1 text-[23px] font-bold capitalize">
+              5 Days Combo
+            </h4>
+            <p className="text-[12px] text-[#343434] mt-1">
+              {" "}
+              Get ready for non-stop Garba magical nights!
+            </p>
+            <h4 className="text-[#191203] text-[26px] mt-1 font-bold">Rs.5999</h4>
+            <button className="bg-[#ccc] mt-1 px-[12px] py-1 text-[18px] rounded-lg text-[#232323]">
+              Book Now
+            </button>
+          </div>
+        </Link>
+        </>
+
+        ))}
+      </div>
+      
       <div className="w-full my-10">
         <img src={managment} alt="managment" />
       </div>

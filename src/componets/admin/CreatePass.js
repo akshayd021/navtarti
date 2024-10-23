@@ -8,7 +8,8 @@ const CreatePass = () => {
   const [editingPass, setEditingPass] = useState(null);
   const { passes, fetchPasses } = useAdminPass();
   const [isThreeDaysCombo, setIsThreeDaysCombo] = useState(false);
-  const [discountType, setDiscountType] = useState("percentage"); // Default to percentage
+  const [isFiveDaysCombo, setIsFiveDaysCombo] = useState(false); // Add state for 5 days combo
+  const [discountType, setDiscountType] = useState("percentage");
 
   useEffect(() => {
     fetchPasses();
@@ -20,7 +21,8 @@ const CreatePass = () => {
       price: "",
       discount: "",
       discountType: "percentage",
-      isThreeDaysCombo: false // Add discountType to initial values
+      isThreeDaysCombo: false,
+      isFiveDaysCombo: false, // Add initial value for 5 days combo
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -43,7 +45,7 @@ const CreatePass = () => {
       if (editingPass) {
         try {
           await axios.put(
-            `http://192.168.29.219:5000/api/admin/update-pass/${editingPass._id}`,
+            `${process.env.REACT_APP_URL}/api/admin/update-pass/${editingPass._id}`,
             values
           );
           fetchPasses();
@@ -54,7 +56,10 @@ const CreatePass = () => {
         }
       } else {
         try {
-          await axios.post("http://192.168.29.219:5000/api/admin/create-pass", values);
+          await axios.post(
+            `${process.env.REACT_APP_URL}/api/admin/create-pass`,
+            values
+          );
           fetchPasses();
           resetForm();
         } catch (error) {
@@ -70,14 +75,17 @@ const CreatePass = () => {
       type: pass.type,
       price: pass.price,
       discount: pass.discount,
-      discountType: pass.discountType || "percentage", 
+      discountType: pass.discountType || "percentage",
     });
-    setIsThreeDaysCombo(pass.isThreeDaysCombo || false); // Adjusting for existing state
+    setIsThreeDaysCombo(pass.isThreeDaysCombo || false);
+    setIsFiveDaysCombo(pass.isFiveDaysCombo || false); // Adjusting for 5-day combo state
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://192.168.29.219:5000/api/admin/delete-pass/${id}`);
+      await axios.delete(
+        `${process.env.REACT_APP_URL}/api/admin/delete-pass/${id}`
+      );
       fetchPasses();
     } catch (error) {
       console.error("Error deleting pass", error);
@@ -115,7 +123,7 @@ const CreatePass = () => {
           <div className="text-red-500">{formik.errors.price}</div>
         )}
 
-    
+        {/* Checkbox for enabling 3 Days Combo */}
         <label className="flex items-center justify-start mb-4">
           <input
             type="checkbox"
@@ -128,9 +136,22 @@ const CreatePass = () => {
           <span className="ml-2">Enable 3 Days Combo</span>
         </label>
 
-        {/* Conditional rendering for discount input */}
-        {isThreeDaysCombo && (
-          <div className="flex justify-between gap-10 ">
+        {/* Checkbox for enabling 5 Days Combo */}
+        <label className="flex items-center justify-start mb-4">
+          <input
+            type="checkbox"
+            checked={isFiveDaysCombo}
+            onChange={(e) => {
+              setIsFiveDaysCombo(e.target.checked);
+              formik.setFieldValue("discount", ""); // Reset discount if checkbox is toggled
+            }}
+          />
+          <span className="ml-2">Enable 5 Days Combo</span>
+        </label>
+
+        {/* Conditional rendering for discount input based on combo selection */}
+        {(isThreeDaysCombo || isFiveDaysCombo) && (
+          <div className="flex justify-between gap-10">
             <input
               type="number"
               name="discount"
@@ -147,7 +168,6 @@ const CreatePass = () => {
               value={formik.values.discountType}
               onChange={(e) => {
                 formik.setFieldValue("discountType", e.target.value);
-                setDiscountType(e.target.value); // Update the discount type state
               }}
               className="w-full px-4 py-2 border rounded-md mb-4"
             >
@@ -177,9 +197,12 @@ const CreatePass = () => {
               <p>Price: {pass.price}</p>
               {pass.discount && (
                 <p>
-                  Discount: {pass.discount} {pass.discountType === "percentage" ? "%" : "Rs"}
+                  Discount: {pass.discount}{" "}
+                  {pass.discountType === "percentage" ? "%" : "Rs"}
                 </p>
               )}
+              {pass.isThreeDaysCombo && <p>3 Days Combo Enabled</p>}
+              {pass.isFiveDaysCombo && <p>5 Days Combo Enabled</p>} {/* Show combo status */}
               <div className="flex mt-4">
                 <button
                   onClick={() => handleEdit(pass)}

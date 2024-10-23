@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 import _ from "lodash";
 import moment from "moment";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useDates } from "../../context/dateContext";
 
 const SuperAdminDashboard = () => {
@@ -23,10 +23,21 @@ const SuperAdminDashboard = () => {
   const [status, setStatus] = useState("");
   const { submittedDates } = useDates(); // Access dates from the context
 
+  const history = useHistory();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Get the token from localStorage (or sessionStorage)
+    
+    // If no token found, redirect to login
+    if (!token) {
+      history.push("/login");
+    }
+  }, [history]);
+
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
-        `http://192.168.29.219:5000/api/pass/get-passes`
+        `${process.env.REACT_APP_URL}/api/pass/get-passes`
       );
       setPass(response.data?.passes);
       setFilteredPasses(response.data?.passes);
