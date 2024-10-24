@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import Loader from "../componets/loader/Loader";
 
 const Login = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -17,21 +23,27 @@ const Login = () => {
     }),
     onSubmit: async (values) => {
       try {
+        setLoading(true);
         const response = await axios.post(
           `${process.env.REACT_APP_URL}/api/auth/login`,
           values
         );
         alert("Login successful!");
-        // You can store the token in local storage or context for later use
         localStorage.setItem("token", response.data.token);
+        setLoading(false);
+        const from = location.state?.from?.pathname || "/admin/super-admin";
+
+        navigate(from);
       } catch (error) {
         console.error("Error during login", error);
+        setLoading(false);
       }
     },
   });
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      {loading && <Loader />}
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
         <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -67,7 +79,9 @@ const Login = () => {
               placeholder="Enter your password"
             />
             {formik.touched.password && formik.errors.password ? (
-              <p className="text-red-500 text-xs mt-1">{formik.errors.password}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {formik.errors.password}
+              </p>
             ) : null}
           </div>
 

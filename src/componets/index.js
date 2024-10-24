@@ -7,4 +7,16 @@ import Checkout from "./Checkout/Checkout";
 import PayNow from "./PayNow";
 import AdminDashboard from "./admin/MainAdmin";
 import SuperAdminDashboard from "./admin/SuperAdmin";
-export { MainHeader, Slider, Footer, Pass, Cart, Checkout, PayNow, AdminDashboard, SuperAdminDashboard }
+import Loader from "./loader/Loader";
+export {
+  MainHeader,
+  Slider,
+  Footer,
+  Pass,
+  Cart,
+  Checkout,
+  PayNow,
+  AdminDashboard,
+  SuperAdminDashboard,
+  Loader,
+};

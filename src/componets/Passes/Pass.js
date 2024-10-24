@@ -8,26 +8,37 @@ import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { useDates } from "../../context/dateContext";
 import { useAdminPass } from "../../context/AddminPassContext";
+import Loader from "../loader/Loader";
 
 const Pass = () => {
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedPassType, setSelectedPassType] = useState("");
+  const [loadings, setLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [pass, setPass] = useState([]);
-  const { submittedDates, fetchDates } = useDates();
-  const { passes, fetchPasses: fetchAllPasses } = useAdminPass();
+  const [singlePass, setSinglePass] = useState([]);
+  const { submittedDates, fetchDates, loading: Dloading } = useDates();
+  const { passes, fetchPasses: fetchAllPasses, loading } = useAdminPass();
 
   const isCombo = id.includes("combo");
-  const comboDays = id.includes("3-days-combo") ? 3 : id.includes("5-days-combo") ? 5 : null;
+  const comboDays = id.includes("3-days-combo")
+    ? 3
+    : id.includes("5-days-combo")
+    ? 5
+    : null;
 
   const fetchSinglePass = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/get-pass/${id}`);
-      setPass(response?.data);
+      const response = await axios.get(
+        `${process.env.REACT_APP_URL}/api/admin/get-pass/${id}`
+      );
+      setSinglePass(response?.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching pass:", error);
+      setLoading(false);
     }
   };
 
@@ -40,36 +51,44 @@ const Pass = () => {
     fetchDates();
   }, []);
 
-  console.log(comboDays, isCombo , "combo")
-  // Handle quantity change
+  console.log(comboDays, isCombo, "combo");
   const handleQuantityChange = (change) => {
     setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
   };
 
-  // Calculate total price based on the selected pass type and quantity
   const total = () => {
-    const pass = passes.find((p) => p.type === selectedPassType);
-    return pass ? pass.price * quantity : 0;
+    if (isCombo) {
+      const pass = passes.find((p) => p.type === selectedPassType);
+      return pass ? pass.price * quantity : 0;
+    } else {
+      return passes ? passes.map((x) => x?.price * x.quantity) : 0;
+    }
   };
 
   const subtotal = total();
 
-  // Handle pass type selection
   const handlePassTypeSelect = (event) => {
     setSelectedPassType(event.target.value);
     setSelectedDates([]);
   };
 
-  // Handle date selection logic
   const handleDateSelect = (date) => {
-    if (selectedDates.includes(date)) {
-      setSelectedDates(selectedDates.filter((d) => d !== date));
-    } else if (selectedDates.length < comboDays) {
-      setSelectedDates([...selectedDates, date]);
+    if (isCombo) {
+      if (selectedDates.includes(date)) {
+        setSelectedDates(selectedDates.filter((d) => d !== date));
+      } else if (selectedDates.length < comboDays) {
+        setSelectedDates([...selectedDates, date]);
+      }
+    } else {
+      // For non-combo, only allow selecting one date
+      if (selectedDates.includes(date)) {
+        setSelectedDates([]); // Deselect the date if already selected
+      } else {
+        setSelectedDates([date]); // Replace with the new date
+      }
     }
   };
 
-  // Handle "Buy Now" click
   const handleBuyNow = async () => {
     if (isCombo && selectedDates.length !== comboDays) {
       alert(`Please select exactly ${comboDays} dates for a combo pass.`);
@@ -77,16 +96,19 @@ const Pass = () => {
     }
 
     if (!isCombo && selectedDates.length !== 1) {
-      alert("Please select a date.");
+      alert("Please select exactly one date.");
       return;
     }
 
-    if (!selectedPassType) {
+    if (!selectedPassType && isCombo) {
       alert("Please select a pass type.");
       return;
     }
 
-    const pass = passes.find((p) => p.type === selectedPassType);
+    const pass = isCombo
+      ? passes.find((p) => p.type === selectedPassType)
+      : singlePass;
+
     const passData = {
       type: pass.type,
       quantity,
@@ -95,19 +117,26 @@ const Pass = () => {
     };
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_URL}/api/passes`, passData);
+      setLoading(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_URL}/api/passes`,
+        passData
+      );
       let passes = JSON.parse(localStorage.getItem("passes")) || [];
       passes.push(response?.data);
       localStorage.setItem("passes", JSON.stringify(passes));
+      setLoading(false);
       navigate("/cart");
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to purchase pass. Please try again.");
+      setLoading(false);
     }
   };
 
   return (
     <div>
+      {loading || Dloading || loadings ? <Loader /> : ""}
       <div
         style={{
           background:
@@ -131,7 +160,7 @@ const Pass = () => {
           {`Tickets - Suvarn Navratri, Surat`}
         </h3>
         <h4 className="text-[25px] text-[#232323] font-semibold mt-5">
-          Rs {total()}.00
+          Price: Rs {isCombo ? total() : singlePass.price}.00
         </h4>
 
         {/* Pass Type Selection */}
@@ -157,18 +186,19 @@ const Pass = () => {
           <p
             className={`p-[2px] mt-4 bg-gradient-to-r from-[#D9007A] via-[#FF9D00] to-[#530179] inline-block "border"}`}
           >
-            {passes?.map((c) => c.type)}
+            {singlePass.type}
           </p>
         )}
       </div>
       <hr className="mx-5" />
 
-      {/* Date Selection Section */}
       <div className="mt-5 text-left px-5 mb-10">
         <h6 className="mt-8 text-[20px] font-semibold text-[#232323]">
-          {isCombo ? `Select ${comboDays} Ticket Dates:` : "Select Ticket Date:"}
+          {isCombo
+            ? `Select ${comboDays} Ticket Dates:`
+            : "Select Ticket Date:"}
         </h6>
-        <div className="flex gap-6 items-center">
+        <div className="flex gap-6 flex-wrap items-center">
           {submittedDates?.map((dateObj) => {
             const formattedDate = moment(dateObj.date).format("DD/MM/YYYY");
             const isSelected = selectedDates.includes(formattedDate);
@@ -188,8 +218,10 @@ const Pass = () => {
                       checked={isSelected}
                       onChange={() => handleDateSelect(formattedDate)}
                       disabled={
-                        !isSelected && isCombo && selectedDates.length === comboDays
-                      } // Disable if max combo dates are selected
+                        !isSelected &&
+                        isCombo &&
+                        selectedDates.length === comboDays
+                      }
                     />
                     {formattedDate}
                   </label>
@@ -203,7 +235,7 @@ const Pass = () => {
       <hr className="mx-5" />
       <div className="mt-5 px-5 text-left">
         <p className="text-[20px] font-[500] text-[#232323]">
-          Subtotal: Rs. {subtotal.toLocaleString()}
+          {/* Subtotal: Rs. {subtotal.toLocaleString()} */}
         </p>
         <p className="text-[20px] font-[400] mt-2 text-[#232323]">Quantity:</p>
         <div className="flex items-center justify-center gap-6 my-4">
@@ -226,7 +258,7 @@ const Pass = () => {
                 isCombo
                   ? selectedDates.length !== comboDays
                   : selectedDates.length !== 1
-              } // Disable if date selection is incomplete
+              }
             >
               Buy Now
             </button>

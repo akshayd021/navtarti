@@ -23,7 +23,7 @@ const SignUp = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(
+        await axios.post(
           `${process.env.REACT_APP_URL}/api/auth/signup`,
           values
         );

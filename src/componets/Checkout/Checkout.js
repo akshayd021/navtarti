@@ -7,14 +7,17 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import moment from "moment";
 import _ from "lodash";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import Loader from "../loader/Loader";
 
 const Checkout = () => {
   const [passes, setPasses] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchUserWithPasses = async () => {
+      setLoading(true);
       try {
         const userResponse = await axios.get(
           `${process.env.REACT_APP_URL}/api/get-pass/${id}`
@@ -26,9 +29,11 @@ const Checkout = () => {
 
         const passesArray = Array.isArray(passData) ? passData : [passData];
 
-        setPasses(passesArray); // Set passes as an array
+        setPasses(passesArray);
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching user or pass data:", err);
+        setLoading(false);
       }
     };
 
@@ -41,7 +46,7 @@ const Checkout = () => {
           const datesKey =
             pass.selectedDates?.length > 0
               ? pass.selectedDates.join(",")
-              : "no-dates"; 
+              : "no-dates";
           const key = `${pass.type}-${datesKey}`;
           if (!acc[key]) {
             acc[key] = { ...pass };
@@ -52,12 +57,12 @@ const Checkout = () => {
           return acc;
         }, {})
       )
-    : []; 
+    : [];
 
   const total = () => {
-    return passes ? passes.map((x) =>(x?.price * x.quantity )) : 0
+    return passes ? passes.map((x) => x?.price * x.quantity) : 0;
   };
-  const subtotal = total()
+  const subtotal = total();
 
   // Form validation schema
   const validationSchema = Yup.object({
@@ -86,34 +91,38 @@ const Checkout = () => {
         firstName: values.firstName,
         lastName: values.lastName,
       }));
-      
+
       // Remove any duplicate passes (based on _id)
       const uniquePasses = _.uniqBy(passesWithDetails, "_id");
-      
+
       // Prepare the payload without creating new passes
       const payload = {
         ...values,
         passes: uniquePasses, // This will send the original pass objects with added names
         _id: uniquePasses.map((x) => x?._id),
       };
-      
+
       try {
-        const response = await axios.post(
+        setLoading(true);
+        await axios.post(
           `${process.env.REACT_APP_URL}/api/pass/send-mail`,
           payload
         );
-        console.log("Payment link and email sent:", response.data);
         localStorage.clear();
+        alert("Email is send Successfully");
+        setLoading(false);
+        navigate("/");
       } catch (error) {
         console.error("Error sending payment link or email:", error);
         alert("There was an error sending the payment link.");
+        setLoading(false);
       }
     },
   });
-  
 
   return (
     <div>
+      {loading && <Loader />}
       <div
         style={{
           background:
@@ -237,8 +246,9 @@ const Checkout = () => {
                     Daily {pass.type === "Gold" ? "Gold" : "Platinum"} Tickets
                   </p>
                   <div
-                    className={` ${pass.selectedDates?.length > 1 ? "block" : "flex"
-                      } gap-3 items-center`}
+                    className={` ${
+                      pass.selectedDates?.length > 1 ? "block" : "flex"
+                    } gap-3 items-center`}
                   >
                     <p>{pass.type === "Gold" ? "Gold" : "Platinum"}</p>
                     <p>
@@ -269,7 +279,8 @@ const Checkout = () => {
             <div className="flex justify-between items-center gap-3 mt-5">
               <h4>
                 SubTotal:{" "}
-                <span className="font-semibold">{groupedPasses?.length}</span> items
+                <span className="font-semibold">{groupedPasses?.length}</span>{" "}
+                items
               </h4>
               <p className="text-lg font-bold">₹{subtotal}.00</p>
             </div>

@@ -8,8 +8,9 @@ import {
 } from "react-icons/fa";
 import _ from "lodash";
 import moment from "moment";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDates } from "../../context/dateContext";
+import Loader from "../loader/Loader";
 
 const SuperAdminDashboard = () => {
   const [passes, setPass] = useState([]);
@@ -21,20 +22,11 @@ const SuperAdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [status, setStatus] = useState("");
-  const { submittedDates } = useDates(); // Access dates from the context
-
-  const history = useHistory();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // Get the token from localStorage (or sessionStorage)
-    
-    // If no token found, redirect to login
-    if (!token) {
-      history.push("/login");
-    }
-  }, [history]);
+  const { submittedDates } = useDates(); 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const fetchData = async () => {
       const response = await axios.get(
         `${process.env.REACT_APP_URL}/api/pass/get-passes`
@@ -42,6 +34,7 @@ const SuperAdminDashboard = () => {
       setPass(response.data?.passes);
       setFilteredPasses(response.data?.passes);
       calculateStats(response.data?.passes);
+      setLoading(false);
     };
     fetchData();
   }, []);
@@ -82,12 +75,12 @@ const SuperAdminDashboard = () => {
       const lowercasedQuery = query.toLowerCase();
       filtered = _.filter(filtered, (pass) => {
         return (
-          _.includes(pass.type.toLowerCase(), lowercasedQuery) || // Search by type
-          _.includes(pass.price.toString(), lowercasedQuery) || // Search by price
-          _.includes(pass.quantity.toString(), lowercasedQuery) || 
-          _.includes(pass.firstName.toString(), lowercasedQuery) ||// Search by quantity
+          _.includes(pass.type.toLowerCase(), lowercasedQuery) || 
+          _.includes(pass.price.toString(), lowercasedQuery) || 
+          _.includes(pass.quantity.toString(), lowercasedQuery) ||
+          _.includes(pass.firstName.toString(), lowercasedQuery) ||
           _.includes(pass.lastName.toString(), lowercasedQuery) ||
-          _.includes(moment(pass.date).format("DD/MM/YYYY"), lowercasedQuery) // Search by date
+          _.includes(moment(pass.date).format("DD/MM/YYYY"), lowercasedQuery) 
         );
       });
     }
@@ -107,7 +100,7 @@ const SuperAdminDashboard = () => {
     }
 
     setFilteredPasses(filtered);
-    calculateStats(filtered); // Recalculate stats for the filtered passes
+    calculateStats(filtered);
   };
 
   const handleSearch = (query) => {
@@ -125,10 +118,11 @@ const SuperAdminDashboard = () => {
     applyFilters(passes, searchQuery, selectedDate, status);
   };
 
-  console.log("filer", passes)
+  console.log("filer", passes);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      {loading && <Loader />}
       <h1 className="text-4xl font-extrabold text-center mb-8 text-gray-900">
         Super Admin Dashboard
       </h1>
@@ -172,49 +166,66 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex justify-between mb-6">
-        <div className="relative w-1/2">
+      <div className="flex flex-col md:flex-row justify-between mb-6 p-4 bg-white rounded-lg shadow-md">
+        {/* Search Input */}
+        <div className="relative w-full md:w-1/2 mb-4 md:mb-0">
           <FaSearch className="absolute left-3 top-3 text-gray-500" />
           <input
             type="text"
             placeholder="Search Passes by Type, UserName, Price, Quantity or Date"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out"
           />
         </div>
-        <Link to={"/admin/add-event"} >
-        Add Event </Link>
-        <Link to={"/admin/create-pass"} >
-        Add Pass </Link>
-       
-        <div className="flex items-center gap-3">
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4 md:mb-0">
+          <Link
+            to={"/admin/add-event"}
+            className="bg-blue-500 text-white px-4 py-2 text-sm rounded-md shadow-md w-full md:w-auto hover:bg-blue-600 transition duration-200 ease-in-out"
+          >
+            Add Event
+          </Link>
+          <Link
+            to={"/admin/create-pass"}
+            className="bg-green-500 text-white px-4 py-2 text-sm rounded-md shadow-md w-full md:w-auto hover:bg-green-600 transition duration-200 ease-in-out"
+          >
+            Add Pass
+          </Link>
+        </div>
+
+        {/* Filter by Status and Date */}
+        <div className="flex items-center gap-1">
+          {/* Filter by Status */}
           <select
             onChange={(e) => handleStatus(e.target.value)}
-            className="px-2 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm focus:ring-blue-500 transition duration-200 ease-in-out"
           >
-            <option value="">Filter by Status</option>
+            <option value="" style={{ fontSize: 12 }}>
+              Filter by Status
+            </option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
             <option value="pending">Pending</option>
           </select>
+
+          {/* Filter by Date */}
           <div className="relative">
-            <FaCalendarAlt className="absolute left-3 top-3 text-gray-500" />
+            <FaCalendarAlt className="md:absolute hidden left-3 top-3 text-gray-500" />
             <select
               onChange={(e) => handleDateFilter(e.target.value)}
-              className="pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-5 pr-2 py-2 border text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out"
             >
               <option value="">Filter by Date</option>
-              {submittedDates?.map((date, i)=>(
-
-              <option value={moment(date?.date).format('DD/MM/YYYY')}>{moment(date?.date).format('DD/MM/YYYY')}</option>
+              {submittedDates?.map((date, i) => (
+                <option key={i} value={moment(date?.date).format("DD/MM/YYYY")}>
+                  {moment(date?.date).format("DD/MM/YYYY")}
+                </option>
               ))}
-      
             </select>
           </div>
         </div>
       </div>
-      {console.log(submittedDates, "submit")}
 
       {/* User Table */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
@@ -254,7 +265,9 @@ const SuperAdminDashboard = () => {
                 <tr key={pass._id} className="border-b border-gray-200">
                   <td className="py-3 px-6">{idx + 1}</td>
                   <td className="py-3 px-6">{pass.type}</td>
-                  <td className="py-3 px-6">{pass.firstName ||"not"} {pass.lastName}</td>
+                  <td className="py-3 px-6">
+                    {pass.firstName || "not"} {pass.lastName}
+                  </td>
                   <td className="py-3 px-6">{pass.quantity}</td>
                   <td className="py-3 px-6">₹{pass.price.toFixed(2)}</td>
                   <td className="py-3 px-6">
@@ -268,7 +281,7 @@ const SuperAdminDashboard = () => {
                     ))}
                   </td>
 
-                  {/* Status Column with Text Color */}
+                 
                   <td className="py-3 px-6">
                     {pass.selectedDates.map((date, i) => (
                       <p

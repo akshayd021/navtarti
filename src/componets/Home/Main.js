@@ -20,17 +20,19 @@ import Slider from "./Slider";
 import Highlights from "./Highlights";
 import { Link } from "react-router-dom";
 import { useAdminPass } from "../../context/AddminPassContext";
+import Loader from "../loader/Loader";
 
 const MainHeader = () => {
-  const { passes, fetchPasses } = useAdminPass();
+  const { passes, fetchPasses , loading } = useAdminPass();
 
   useEffect(() => {
     fetchPasses();
   }, []);
   const sortedPasses = [...passes].sort((a, b) => a.price - b.price);
-
+console.log(passes, "pasee")
   return (
     <div>
+      {loading && <Loader/>}
       <div
         className="bg-cover bg-center h-[554px] w-full"
         style={{ backgroundImage: `url(${mainBg})` }}
@@ -186,7 +188,11 @@ const MainHeader = () => {
               </button>
             </div>
           </Link>
-          <Link to={`/products/3-days-combo`}>
+         
+        </>
+
+        ))}
+         <Link to={`/products/3-days-combo`}>
           <div
             className="bg-center bg-cover h-[170px] w-[378px] text-left px-6 py-4 mx-auto my-10"
             style={{ backgroundImage: `url(${pass2})` }}
@@ -222,9 +228,6 @@ const MainHeader = () => {
             </button>
           </div>
         </Link>
-        </>
-
-        ))}
       </div>
       
       <div className="w-full my-10">

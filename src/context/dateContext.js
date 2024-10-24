@@ -7,13 +7,19 @@ const DatesContext = createContext();
 // Context provider component
 export const DatesProvider = ({ children }) => {
   const [submittedDates, setSubmittedDates] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchDates = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/dates`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_URL}/api/dates`
+      );
       setSubmittedDates(response?.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching dates:", error);
+      setLoading(false);
     }
   };
 
@@ -22,7 +28,7 @@ export const DatesProvider = ({ children }) => {
   }, []);
 
   return (
-    <DatesContext.Provider value={{ submittedDates, fetchDates }}>
+    <DatesContext.Provider value={{ submittedDates, fetchDates, loading }}>
       {children}
     </DatesContext.Provider>
   );
